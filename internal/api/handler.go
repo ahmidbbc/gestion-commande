@@ -26,6 +26,7 @@ func NewHandler(svc *service.Service) *Handler {
 func (h *Handler) ListenAndServe(addr string) error {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", h.health)
+	mux.HandleFunc("GET /commandes/{id}", h.getCommande)
 	mux.HandleFunc("PATCH /commandes/{id}/statut", h.updateStatut)
 	return http.ListenAndServe(addr, mux)
 }
@@ -43,6 +44,25 @@ type commandeResponse struct {
 	ID     string         `json:"id"`
 	Statut service.Statut `json:"statut"`
 	CreeLe string         `json:"cree_le"`
+}
+
+func (h *Handler) getCommande(w http.ResponseWriter, r *http.Request) {
+	c, err := h.svc.GetCommande(r.PathValue("id"))
+	switch {
+	case errors.Is(err, store.ErrCommandeIntrouvable):
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	case err != nil:
+		http.Error(w, "erreur interne", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(commandeResponse{
+		ID:     c.ID,
+		Statut: c.Statut,
+		CreeLe: c.CreeLe.Format(time.RFC3339),
+	})
 }
 
 func (h *Handler) updateStatut(w http.ResponseWriter, r *http.Request) {

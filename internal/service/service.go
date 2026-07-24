@@ -24,6 +24,11 @@ func New(repo Repository, commandes CommandeRepository) *Service {
 	return &Service{repo: repo, commandes: commandes}
 }
 
+// GetCommande returns the commande matching the given order number (ID).
+func (s *Service) GetCommande(id string) (Commande, error) {
+	return s.commandes.Get(id)
+}
+
 // UpdateStatut sets a new lifecycle status on an existing commande.
 func (s *Service) UpdateStatut(id string, statut Statut) (Commande, error) {
 	if !statut.Valide() {
