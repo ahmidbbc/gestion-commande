@@ -83,6 +83,7 @@ func (c Commande) Valide() error {
 // CommandeRepository is the persistence port for commandes. The concrete
 // implementation lives in internal/store.
 type CommandeRepository interface {
+	Create(c Commande) error
 	Save(c Commande) error
 	Get(id string) (Commande, error)
 	List() ([]Commande, error)

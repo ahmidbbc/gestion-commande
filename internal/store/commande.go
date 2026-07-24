@@ -11,6 +11,9 @@ import (
 // ErrCommandeIntrouvable is returned when a commande ID has no match.
 var ErrCommandeIntrouvable = errors.New("commande introuvable")
 
+// ErrCommandeExiste is returned when creating a commande whose ID already exists.
+var ErrCommandeExiste = errors.New("commande déjà existante")
+
 // CommandeStore persists commandes in memory.
 type CommandeStore struct {
 	mu        sync.RWMutex
@@ -20,6 +23,17 @@ type CommandeStore struct {
 // NewCommandeStore builds an empty in-memory commande repository.
 func NewCommandeStore() *CommandeStore {
 	return &CommandeStore{commandes: make(map[string]service.Commande)}
+}
+
+// Create inserts a new commande, rejecting an ID that already exists.
+func (s *CommandeStore) Create(c service.Commande) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if _, ok := s.commandes[c.ID]; ok {
+		return ErrCommandeExiste
+	}
+	s.commandes[c.ID] = c
+	return nil
 }
 
 // Save inserts or replaces a commande.
