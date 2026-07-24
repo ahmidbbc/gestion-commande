@@ -2,7 +2,12 @@
 // repository interfaces, never on the api (handler) layer.
 package service
 
-import "errors"
+import (
+	"crypto/rand"
+	"encoding/hex"
+	"errors"
+	"time"
+)
 
 // ErrStatutInvalide is returned when a requested status is not a known Statut.
 var ErrStatutInvalide = errors.New("statut invalide")
@@ -22,6 +27,32 @@ type Service struct {
 // New builds a Service with its injected repositories.
 func New(repo Repository, commandes CommandeRepository) *Service {
 	return &Service{repo: repo, commandes: commandes}
+}
+
+// CreateCommande validates the client and produits, stamps the new commande
+// with an ID, an "en_cours" status and a creation time, then persists it.
+func (s *Service) CreateCommande(client string, produits []Produit) (Commande, error) {
+	c := Commande{
+		ID:       nouvelID(),
+		Client:   client,
+		Produits: produits,
+		Statut:   StatutEnCours,
+		CreeLe:   time.Now(),
+	}
+	if err := c.Valide(); err != nil {
+		return Commande{}, err
+	}
+	if err := s.commandes.Create(c); err != nil {
+		return Commande{}, err
+	}
+	return c, nil
+}
+
+// nouvelID returns a random hex identifier for a new commande.
+func nouvelID() string {
+	var b [16]byte
+	_, _ = rand.Read(b[:])
+	return hex.EncodeToString(b[:])
 }
 
 // GetCommande returns the commande matching the given order number (ID).
