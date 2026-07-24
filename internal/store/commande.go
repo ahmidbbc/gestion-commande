@@ -51,3 +51,16 @@ func (s *CommandeStore) List() ([]service.Commande, error) {
 	}
 	return out, nil
 }
+
+// ListByStatut returns the commandes whose status equals statut.
+func (s *CommandeStore) ListByStatut(statut service.Statut) ([]service.Commande, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	out := make([]service.Commande, 0)
+	for _, c := range s.commandes {
+		if c.Statut == statut {
+			out = append(out, c)
+		}
+	}
+	return out, nil
+}

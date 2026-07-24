@@ -86,4 +86,5 @@ type CommandeRepository interface {
 	Save(c Commande) error
 	Get(id string) (Commande, error)
 	List() ([]Commande, error)
+	ListByStatut(statut Statut) ([]Commande, error)
 }

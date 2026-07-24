@@ -29,6 +29,18 @@ func (s *Service) GetCommande(id string) (Commande, error) {
 	return s.commandes.Get(id)
 }
 
+// ListCommandes returns all commandes. When statut is non-empty, only the
+// commandes with that status are returned; an unknown status is rejected.
+func (s *Service) ListCommandes(statut Statut) ([]Commande, error) {
+	if statut == "" {
+		return s.commandes.List()
+	}
+	if !statut.Valide() {
+		return nil, ErrStatutInvalide
+	}
+	return s.commandes.ListByStatut(statut)
+}
+
 // UpdateStatut sets a new lifecycle status on an existing commande.
 func (s *Service) UpdateStatut(id string, statut Statut) (Commande, error) {
 	if !statut.Valide() {
