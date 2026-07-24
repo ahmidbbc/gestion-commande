@@ -12,7 +12,8 @@ import (
 
 func main() {
 	repo := store.New()
-	svc := service.New(repo)
+	commandes := store.NewCommandeStore()
+	svc := service.New(repo, commandes)
 	h := api.NewHandler(svc)
 	log.Fatal(h.ListenAndServe(":8080"))
 }
