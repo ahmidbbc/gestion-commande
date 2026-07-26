@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestion des commandes</title>
+  <style>
+    :root {
+      --bg: #f5f6fa;
+      --card: #ffffff;
+      --border: #e2e5ec;
+      --text: #1f2430;
+      --muted: #6b7280;
+      --accent: #4f46e5;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      background: var(--accent);
+      color: #fff;
+      padding: 24px 32px;
+    }
+    header h1 { margin: 0; font-size: 22px; }
+    header p { margin: 4px 0 0; opacity: .85; font-size: 14px; }
+    main { max-width: 900px; margin: 32px auto; padding: 0 16px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,.05);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 14px 18px; text-align: left; }
+    thead th {
+      background: #fafbfd;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #fafbfd; }
+    td.total { font-variant-numeric: tabular-nums; font-weight: 600; }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-payée    { background: #e6f4ea; color: #1e7e34; }
+    .badge-encours  { background: #fff4e5; color: #b76e00; }
+    .badge-expédiée { background: #e7f0ff; color: #1a56db; }
+    .badge-annulée  { background: #fdecea; color: #c0392b; }
+    .badge-default  { background: #eef0f4; color: #4b5563; }
+    .empty { padding: 32px; text-align: center; color: var(--muted); }
+    footer { max-width: 900px; margin: 24px auto; padding: 0 16px; color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Gestion des commandes</h1>
+    <p>Liste des commandes clients</p>
+  </header>
+  <main>
+    <section id="orders" class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Référence</th>
+            <th>Client</th>
+            <th>Montant</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{- if .Orders}}
+          {{- range .Orders}}
+          <tr>
+            <td>{{.ID}}</td>
+            <td>{{.Customer}}</td>
+            <td class="total">{{printf "%.2f" .Total}} €</td>
+            <td><span class="badge {{statusClass .Status}}">{{.Status}}</span></td>
+          </tr>
+          {{- end}}
+          {{- else}}
+          <tr><td colspan="4" class="empty">Aucune commande.</td></tr>
+          {{- end}}
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <footer>{{len .Orders}} commande(s) — gestion-commande</footer>
+</body>
+</html>
